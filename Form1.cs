@@ -38,13 +38,29 @@ namespace GOL_Project
         // Calculate the next generation of cells
         private void NextGeneration()
         {
+            for(int y = 0; y < universe.GetLength(1); y++)
+            {
+                for (int x = 0; x < universe.GetLength(0); x++)
+                {
+                    //int count = CountNeighbor
 
+                    //Apply the rules
+
+                    //Turn in on/off the scrathPad
+
+                }
+            }
+
+            //Copy from scratchPad to universe
+            //use swap code from misc.
 
             // Increment generation count
             generations++;
 
             // Update status strip generations
             toolStripStatusLabelGenerations.Text = "Generations = " + generations.ToString();
+
+            //invalidate graphics here or in tick section
         }
 
         // The event called by the timer every Interval milliseconds.
@@ -117,6 +133,33 @@ namespace GOL_Project
                 // Tell Windows you need to repaint
                 graphicsPanel1.Invalidate();
             }
+        }
+
+        private void startToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void newToolStripButton_Click(object sender, EventArgs e)
+        {
+            for (int y = 0; y < universe.GetLength(1); y++)
+            {
+                for (int x = 0; x < universe.GetLength(0); x++)
+                {
+                    universe[x, y] = false;
+                }
+            }
+            graphicsPanel1.Invalidate();
         }
     }
 }
