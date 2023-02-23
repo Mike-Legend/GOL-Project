@@ -58,13 +58,13 @@
             // 
             // button3
             // 
-            this.button3.DialogResult = System.Windows.Forms.DialogResult.Retry;
             this.button3.Location = new System.Drawing.Point(212, 27);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(72, 20);
             this.button3.TabIndex = 2;
             this.button3.Text = "Randomize";
             this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
             // numericUpDown1
             // 

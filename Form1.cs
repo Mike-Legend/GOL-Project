@@ -15,6 +15,7 @@ namespace GOL_Project
 {
     public partial class Form1 : Form
     {
+        //main x,y initializers
         public static int mainX = 10;
         public static int mainY = 10;
 
@@ -28,23 +29,27 @@ namespace GOL_Project
         Color numColor = Color.Red;
         Color backColor = Color.White;
 
-        Font font = new Font("Arial", 15);
+        //fonts
+        Font font = new Font("Arial", 10);
         Font font2 = new Font("Arial", 10);
 
         // The Timer class
         Timer timer = new Timer();
 
-        // Generation count
+        // bottom strip trackers
         int NeighborCount;
         int generations = 0;
         int alive = 0;
         int seed;
+
+        //bool settings
         bool HUDVisible = true;
         bool CountVisible = true;
         bool GridVisible = true;
         bool ToroidalVisible = true;
         bool FiniteVisible = false;
 
+        //main form
         public Form1()
         {
             InitializeComponent();
@@ -59,6 +64,7 @@ namespace GOL_Project
             gridColor = Properties.Settings.Default.GridColor;
         }
 
+        //count neighbors finite
         private int CountNeighborsFinite(int x, int y)
         {
             int count = 0;
@@ -98,6 +104,8 @@ namespace GOL_Project
             }
             return count;
         }
+
+        //count neighbors toroidal
         private int CountNeighborsToroidal(int x, int y)
         {
             int count = 0;
@@ -191,8 +199,7 @@ namespace GOL_Project
             generations++;
 
             // Update status strip generations
-            toolStripStatusLabelGenerations.Text = "Generations = " + generations.ToString();
-            toolStripStatusLabel1.Text = "Alive = " + alive.ToString();
+            toolStripStatusLabelGenerations.Text = "Generations = " + generations.ToString();           
             graphicsPanel1.Invalidate();
         }
 
@@ -216,6 +223,7 @@ namespace GOL_Project
             Brush numBrush = new SolidBrush(numColor);
             Brush backBrush = new SolidBrush(backColor);
 
+            alive = 0;
             // Iterate through the universe in the y, top to bottom
             for (int y = 0; y < universe.GetLength(1); y++)
             {
@@ -233,11 +241,14 @@ namespace GOL_Project
                     if (universe[x, y] == true)
                     {
                         e.Graphics.FillRectangle(cellBrush, cellRect);
+                        alive++;
                     }
                     if (universe[x, y] == false)
                     {
                         e.Graphics.FillRectangle(backBrush, cellRect);
                     }
+
+                    toolStripStatusLabel1.Text = "Alive = " + alive.ToString();
 
                     if (FiniteVisible == true)
                     {
@@ -247,7 +258,6 @@ namespace GOL_Project
                     {
                         NeighborCount = CountNeighborsToroidal(x, y);
                     }
-
                     if (CountVisible == true)
                     {
                         if (NeighborCount != 0)
@@ -259,21 +269,20 @@ namespace GOL_Project
                             e.Graphics.DrawString(NeighborCount.ToString(), font, numBrush, rect, stringFormat);
                         }
                     }
-
                     if (GridVisible == true)
                     {
                         e.Graphics.DrawRectangle(gridPen, cellRect.X, cellRect.Y, cellRect.Width, cellRect.Height);
                     }
-
                     if (HUDVisible == true)
                     {
+                        //NO idea why my cell count hud is overlapping, when nothing else is.                       
                         StringFormat stringFormat2 = new StringFormat();
                         stringFormat2.Alignment = StringAlignment.Near;
                         stringFormat2.LineAlignment = StringAlignment.Near;
                         Rectangle rect2 = new Rectangle(0, 0, 300, 200);
                         e.Graphics.DrawString("Universe Size: {Width=" + mainX + ", Height=" + mainY + "}" + "\nBoundary Type: " +
                         "\nGenerations: " + generations.ToString() + "\nCell Count: " + alive.ToString(), font2, numBrush, rect2, stringFormat2);
-                    }
+                    }                   
                 }
             }
 
@@ -284,6 +293,7 @@ namespace GOL_Project
             backBrush.Dispose();
         }
 
+        //mouse clicker on form
         private void graphicsPanel1_MouseClick(object sender, MouseEventArgs e)
         {
             // If the left mouse button was clicked
@@ -307,16 +317,19 @@ namespace GOL_Project
             }
         }
 
+        //exit button
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.Close();
         }
 
+        //form loads
         private void Form1_Load(object sender, EventArgs e)
         {
             //loaded
         }
 
+        //new file button
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
         {
             universe = new bool[mainX, mainY];
@@ -325,9 +338,11 @@ namespace GOL_Project
             alive = 0;
             toolStripStatusLabelGenerations.Text = "Generations = " + generations.ToString();
             toolStripStatusLabel1.Text = "Alive = " + alive.ToString();
+            toolStripStatusLabel2.Text = "Seed = " + seed.ToString();
             graphicsPanel1.Invalidate();
         }
-
+        
+        //Open logs
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenFileDialog dlg = new OpenFileDialog();
@@ -337,25 +352,24 @@ namespace GOL_Project
             if (DialogResult.OK == dlg.ShowDialog())
             {
                 StreamReader reader = new StreamReader(dlg.FileName);
-                int maxWidth = 0;
-                int maxHeight = 0;
 
                 while (!reader.EndOfStream)
                 {
                     string row = reader.ReadLine();
-                    if(row.Contains("!"))
+                    if (row.Contains("!"))
                     {
                         continue;
                     }
-                    if(!row.Contains("!"))
+                    if (!row.Contains("!"))
                     {
-                        maxWidth = row.Length;      
-                        maxHeight++;
+                        mainX = row.Length;
+                        mainY++;
                     }
                 }
 
-                universe = new bool[maxWidth, maxHeight];
-                scratchPad = new bool[maxWidth, maxHeight];
+                //new arrays
+                universe = new bool[mainX, mainY];
+                scratchPad = new bool[mainX, mainY];
                 reader.BaseStream.Seek(0, SeekOrigin.Begin);
                 int yPos = 0;
                 while (!reader.EndOfStream)
@@ -366,7 +380,7 @@ namespace GOL_Project
                         continue;
                     }
                     if (!row.Contains("!"))
-                    {                      
+                    {
                         for (int xPos = 0; xPos < row.Length; xPos++)
                         {
                             if (row[xPos] == 'O')
@@ -378,25 +392,23 @@ namespace GOL_Project
                             {
                                 universe[xPos, yPos] = false;
                                 scratchPad[xPos, yPos] = false;
-                            }                          
+                            }
                         }
                         yPos++;
-                    }                   
+                    }
                 }
                 reader.Close();
+                //close and reset
                 generations = 0;
                 alive = 0;
                 toolStripStatusLabelGenerations.Text = "Generations = " + generations.ToString();
                 toolStripStatusLabel1.Text = "Alive = " + alive.ToString();
+                toolStripStatusLabel2.Text = "Seed = " + seed.ToString();
                 graphicsPanel1.Invalidate();
             }
         }
 
-        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-
-        }
-
+        //save files
         private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SaveFileDialog dlg = new SaveFileDialog();
@@ -428,6 +440,7 @@ namespace GOL_Project
             }
         }
 
+        //hud visibility
         private void hUDToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (HUDVisible == false)
@@ -445,6 +458,7 @@ namespace GOL_Project
             graphicsPanel1.Invalidate();
         }
 
+        //neighborcount visibility
         private void neighborCountToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (CountVisible == false)
@@ -462,6 +476,7 @@ namespace GOL_Project
             graphicsPanel1.Invalidate();
         }
 
+        //Grid visibility
         private void gridToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (GridVisible == false)
@@ -479,6 +494,7 @@ namespace GOL_Project
             graphicsPanel1.Invalidate();
         }
 
+        //toroidal visibility
         private void toroidalToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (ToroidalVisible == false)
@@ -496,6 +512,7 @@ namespace GOL_Project
             graphicsPanel1.Invalidate();
         }
 
+        //finite visibility
         private void finiteToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (FiniteVisible == false)
@@ -513,32 +530,12 @@ namespace GOL_Project
             graphicsPanel1.Invalidate();
         }
 
-        //public static int xhome;
-        //public static int home
-        //{
-        //    get
-        //    {
-        //        return xhome;
-        //    }
-        //    set
-        //    {
-        //        xhome = value;
-        //    }
-        //}
-
+        //from seed settings
         private void fromSeedToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SeedDialog dlg = new SeedDialog();
             dlg.ModalSeed = seed;
-            //dlg.ModalRand = home;
             int num;
-
-            //if (DialogResult.Retry == dlg.ShowDialog())
-            //{
-            //    Random rand = new Random(seed);
-            //    home = rand.Next();
-            //    home = dlg.ModalRand;
-            //}
 
             if (DialogResult.OK == dlg.ShowDialog())
             {
@@ -560,14 +557,17 @@ namespace GOL_Project
                         }
                     }
                 }
+                //reset all
                 generations = 0;
                 alive = 0;
                 toolStripStatusLabelGenerations.Text = "Generations = " + generations.ToString();
                 toolStripStatusLabel1.Text = "Alive = " + alive.ToString();
+                toolStripStatusLabel2.Text = "Seed = " + seed.ToString();
                 graphicsPanel1.Invalidate();
             }
         }
 
+        //from current seed
         private void fromCurrentSeedToolStripMenuItem_Click(object sender, EventArgs e)
         {
             int num;
@@ -588,17 +588,21 @@ namespace GOL_Project
                     }
                 }
             }
+            //reset all
             generations = 0;
             alive = 0;
             toolStripStatusLabelGenerations.Text = "Generations = " + generations.ToString();
             toolStripStatusLabel1.Text = "Alive = " + alive.ToString();
+            toolStripStatusLabel2.Text = "Seed = " + seed.ToString();
             graphicsPanel1.Invalidate();
         }
 
+        //from time of day seed
         private void fromTimeToolStripMenuItem_Click(object sender, EventArgs e)
         {
             int num;
             Random rand = new Random(DateTime.Now.Day);
+            seed = rand.Next();
 
             for (int y = 0; y < universe.GetLength(1); y++)
             {
@@ -615,13 +619,16 @@ namespace GOL_Project
                     }
                 }
             }
+            //reset all
             generations = 0;
             alive = 0;
             toolStripStatusLabelGenerations.Text = "Generations = " + generations.ToString();
             toolStripStatusLabel1.Text = "Alive = " + alive.ToString();
+            toolStripStatusLabel2.Text = "Seed = " + seed.ToString();
             graphicsPanel1.Invalidate();
         }
 
+        //back color settings
         private void backColorToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ColorDialog dlg = new ColorDialog();
@@ -633,6 +640,7 @@ namespace GOL_Project
             }
         }
 
+        //cell color settings
         private void cellColorToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ColorDialog dlg = new ColorDialog();
@@ -644,6 +652,7 @@ namespace GOL_Project
             }
         }
 
+        //grid color settings
         private void gridColorToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ColorDialog dlg = new ColorDialog();
@@ -655,6 +664,7 @@ namespace GOL_Project
             }
         }
 
+        //options in settings button, for modal
         private void optionsToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             ModalDialog dlg = new ModalDialog();
@@ -675,6 +685,7 @@ namespace GOL_Project
             }
         }
 
+        //reset button in settings
         private void resetToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Properties.Settings.Default.Reset();
@@ -684,6 +695,7 @@ namespace GOL_Project
             graphicsPanel1.Invalidate();
         }
 
+        //reload button in settings
         private void reloadToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Properties.Settings.Default.Reload();
@@ -693,27 +705,32 @@ namespace GOL_Project
             graphicsPanel1.Invalidate();
         }
 
+        //right clicker
         private void contextMenuStrip1_Opening(object sender, CancelEventArgs e)
         {
             //opens the right click
         }
 
+        //play button
         private void toolStripButton1_Click(object sender, EventArgs e)
         {
             timer.Enabled = true;
         }
 
+        //pause button
         private void toolStripButton2_Click(object sender, EventArgs e)
         {
             timer.Enabled = false;
         }
 
+        //next button
         private void toolStripButton3_Click(object sender, EventArgs e)
         {
             NextGeneration();
             graphicsPanel1.Invalidate();
         }
 
+        //exiting program
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
             Properties.Settings.Default.PanelColor = backColor;

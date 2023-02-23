@@ -17,6 +17,7 @@ namespace GOL_Project
             InitializeComponent();          
         }
 
+        //public seed
         public int ModalSeed
         {
             get
@@ -29,16 +30,11 @@ namespace GOL_Project
             }
         }
 
-        //public int ModalRand
-        //{
-        //    get
-        //    {
-        //        return (int)numericUpDown1.Value;
-        //    }
-        //    set
-        //    {
-        //        numericUpDown1.Value = Form1.home;
-        //    }
-        //}
+        //randomize button
+        private void button3_Click(object sender, EventArgs e)
+        {
+            Random rand = new Random();
+            numericUpDown1.Value = rand.Next();
+        }
     }
 }

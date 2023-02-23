@@ -17,6 +17,7 @@ namespace GOL_Project
             InitializeComponent();
         }
 
+        //public timer
         public int ModalTimer
         {
             get
@@ -29,6 +30,7 @@ namespace GOL_Project
             }
         }
 
+        //public width
         public int ModalWidth
         {
             get
@@ -40,6 +42,8 @@ namespace GOL_Project
                 numericUpDown2.Value = value;
             }
         }
+
+        //public height
         public int ModalHeight
         {
             get
